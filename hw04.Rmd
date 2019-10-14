@@ -1,0 +1,87 @@
+---
+title: "hw04"
+author: "Olivia Huang"
+date: "10/13/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##1.a)
+```{r}
+devtools::install_github("tidyverse/dplyr")
+
+library("dplyr")
+
+content <- mget(ls("package:dplyr"), inherits = TRUE)
+dplyr_functions <- Filter(is.function, content)
+```
+
+
+```{r}
+library("purrr")
+names(dplyr_functions)
+map_lgl(names(dplyr_functions), function(x) nchar(x) == max(nchar(names(dplyr_functions))))
+print(names(dplyr_functions)[107])
+```
+
+##1.b)
+```{r}
+arg_count = map_int(dplyr_functions, function(x) length(formals(x)))
+head(sort(unlist(arg_count),  decreasing=TRUE) ,10)
+```
+
+##1.c)
+```{r}
+# map_chr(dplyr_functions, function(x) formals(x))
+```
+
+##2.a)
+
+```{r}
+library(WDI)
+library(dplyr)
+
+dat <- WDI(indicator=c("gdpcap" = 'NY.GDP.PCAP.KD',"infmort" = 'SP.DYN.IMRT.IN'),  extra = TRUE, start=1960, end=2018)
+
+dat_2018 <- WDI(indicator = c("gdpcap" = "NY.GDP.PCAP.KD",
+                         "infmort" = "SP.DYN.IMRT.IN"), extra = TRUE, start = 2018, end = 2018)
+dat_2018 <- dat_2018[ -c(1, 3, 6:12)]
+head(dat_2018[complete.cases(dat), ])
+```
+
+```{r}
+dec_dat_2018 <- dat_2018[order(dat_2018$infmort, decreasing = TRUE),]
+highest_2018 <- dec_dat_2018[complete.cases(dec_dat_2018), ]
+
+dec_dat_2018 <- dat_2018[order(dat_2018$infmort, decreasing = FALSE),]
+lowest_2018 <-dec_dat_2018[complete.cases(dec_dat_2018), ]
+
+the_2018_list <- rbind(highest_2018,lowest_2018)
+the_2018_list
+```
+
+##2.b)
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(WDI)
+data(WDI_data, package = "WDI")
+
+summary(lm( infmort ~ gdpcap, data = dat))
+```
+
+```{r}
+plot(infmort ~ gdpcap, data = dat)
+abline(lm( infmort ~ gdpcap, data = dat))
+```
+
+##2.c)
+
+
+
+
